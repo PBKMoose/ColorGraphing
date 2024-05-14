@@ -6,8 +6,8 @@ import java.util.Random;
 public class GraphColoring { // Class name
 
     private static final int MAX_COLORS = 4; // Maximum allowed colours
-    private static final double INITIAL_TEMPERATURE = 0.95; // Initial temperature
-    private static final double COOLING_RATE = 0.77; // Cooling rate
+    private static final double INITIAL_TEMPERATURE = 0.92; // Initial temperature
+    private static final double COOLING_RATE = 0.87; // Cooling rate
     public static void main(String[] args) {
 
         int[][] graph = {
@@ -18,7 +18,7 @@ public class GraphColoring { // Class name
                 {1, 1, 1, 1, 0, 1, 1, 1}, // Node 4 connected to all other nodes
                 {1, 1, 1, 1, 1, 0, 1, 1}, // Node 5 connected to all other nodes
                 {1, 1, 1, 1, 1, 1, 0, 1}, // Node 6 connected to all other nodes
-                {1, 1, 1, 1, 1, 1, 1, 0}  // Node 7 connected to all other nodes
+                {1, 1, 1, 1, 1, 1, 1, 0},  // Node 7 connected to all other nodes
         };
         int iterations = 10000;
 
@@ -60,11 +60,17 @@ public class GraphColoring { // Class name
         System.out.println("Best Fitness: " + calculateFitness(graph, bestColouring));
 
         // Check for clashes in best colouring using your method
-        if (bestClashes > 0) {
-            System.out.println("Note: Best colouring still has " + bestClashes + " clashes.");
-        } else {
-            System.out.println("Success: Best colouring has no clashes!");
-        }
+//        if (bestClashes > 0) {
+//            System.out.println("Note: Best colouring still has " + bestClashes +  " clashes.");
+//        } else {
+//            System.out.println("Success: Best colouring has no clashes!");
+//        }
+
+        int randomNode = (int) (Math.random() * graph.length);
+        int randomNodeClashes = colourClashes(bestColouring, graph);
+
+        System.out.println("Checking random node: " + randomNode);
+        System.out.println("Clashes at random node: " + randomNodeClashes);
 
 
 
@@ -108,12 +114,13 @@ public class GraphColoring { // Class name
     }
 
     public static int colourClashes(ArrayList<Integer> colouring, int[][] graph) {
+        int randomNode = (int) (Math.random() * graph.length); // Generate a random node index
+
         int clashes = 0;
-        for (int node = 0; node < graph.length; node++) {
-            for (int neighbour = 0; neighbour < graph.length; neighbour++) {
-                if (neighbour != node && graph[node][neighbour] == 1 && colouring.get(node) == colouring.get(neighbour)) {
-                    clashes++;
-                }
+        for (int neighbour = 0; neighbour < graph.length; neighbour++) {
+            if (neighbour != randomNode && graph[randomNode][neighbour] == 1 && colouring.get(randomNode) == colouring.get(neighbour)) {
+                clashes++;
+
             }
         }
         return clashes;
