@@ -1,26 +1,55 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class GraphColoring { // Class name
 
     private static final int MAX_COLORS = 4; // Maximum allowed colours
-    private static final double INITIAL_TEMPERATURE = 0.92; // Initial temperature
-    private static final double COOLING_RATE = 0.87; // Cooling rate
+    private static final double INITIAL_TEMPERATURE = 0.99; // Initial temperature
+    private static final double COOLING_RATE = 0.72; // Cooling rate
     public static void main(String[] args) {
 
         int[][] graph = {
-                {0, 1, 1, 1, 1, 1, 1, 1}, // Node 0 connected to all other nodes
-                {1, 0, 1, 1, 1, 1, 1, 1}, // Node 1 connected to all other nodes
-                {1, 1, 0, 1, 1, 1, 1, 1}, // Node 2 connected to all other nodes
-                {1, 1, 1, 0, 1, 1, 1, 1}, // Node 3 connected to all other nodes
-                {1, 1, 1, 1, 0, 1, 1, 1}, // Node 4 connected to all other nodes
-                {1, 1, 1, 1, 1, 0, 1, 1}, // Node 5 connected to all other nodes
-                {1, 1, 1, 1, 1, 1, 0, 1}, // Node 6 connected to all other nodes
-                {1, 1, 1, 1, 1, 1, 1, 0},  // Node 7 connected to all other nodes
+                {0,1,1,0,0,0,1,0,1,0,1,1,0,1,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,0,0,0},
+                {1,0,0,0,0,1,1,0,1,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,1},
+                {1,0,0,1,1,0,0,1,1,1,1,0,1,0,1,0,1,0,0,0,1,0,0,1,0,1,1,1,0,1,1,1},
+                {0,0,1,0,0,1,1,0,0,0,1,0,1,0,1,1,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,0},
+                {0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,1,1,0,1,0,1,1,1,0,0,0,0,1,0,0,0,1},
+                {0,1,0,1,0,0,1,1,0,1,1,0,1,1,1,1,0,1,0,1,0,1,1,0,0,0,0,1,1,1,1,1},
+                {1,1,0,1,1,1,0,0,0,1,0,1,1,0,0,0,0,0,1,1,0,0,0,1,1,1,0,1,0,0,1,1},
+                {0,0,1,0,0,1,0,0,1,1,1,1,0,1,0,0,1,1,0,0,0,1,0,1,0,0,0,1,0,0,1,1},
+                {1,1,1,0,1,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,1,0,0,0,1,0},
+                {0,1,1,0,0,1,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,0,0,1,1,0,0,0,1},
+                {1,0,1,1,1,1,0,1,0,1,0,1,1,0,1,1,0,0,0,1,0,1,1,0,1,1,1,1,1,0,1,0},
+                {1,0,0,0,0,0,1,1,0,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,1,1,1,0,0,1,1,1},
+                {0,1,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,1,1,1,1,0},
+                {1,1,0,0,0,1,0,1,0,0,0,0,0,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,0,0,0},
+                {1,1,1,1,0,1,0,0,0,1,1,1,0,1,0,1,0,1,1,1,0,0,0,1,0,0,1,1,0,1,1,0},
+                {1,0,0,1,1,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,0,1},
+                {0,1,1,1,1,0,0,1,0,1,0,0,0,1,0,0,0,0,0,1,1,1,0,0,1,1,0,0,0,0,0,0},
+                {0,0,0,0,0,1,0,1,1,0,0,0,1,1,1,0,0,0,1,0,0,1,1,0,1,1,1,0,0,0,0,0},
+                {1,1,0,1,1,0,1,0,0,1,0,0,0,1,1,0,0,1,0,0,1,0,0,0,1,0,0,0,1,1,0,0},
+                {1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0},
+                {0,1,1,0,1,0,0,0,1,1,0,1,1,1,0,1,1,0,1,0,0,1,0,0,0,0,1,1,0,1,0,1},
+                {1,0,0,0,1,1,0,1,0,0,1,1,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,1,1,1,1,1},
+                {0,0,0,0,1,1,0,0,0,1,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0,1,1},
+                {0,0,1,1,0,0,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0},
+                {1,0,0,0,0,0,1,0,1,0,1,1,0,1,0,0,1,1,1,0,0,0,0,1,0,1,0,1,0,0,0,1},
+                {0,0,1,0,0,0,1,0,1,0,1,1,0,1,0,1,1,1,0,1,0,0,1,0,1,0,1,1,1,1,0,0},
+                {1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,1,0,0,1,0,1,0,0,1,0,1,1,1,1,0},
+                {1,0,1,0,1,1,1,1,0,1,1,0,1,0,1,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,1,0},
+                {0,1,0,1,0,1,0,0,0,0,1,0,1,1,0,0,0,0,1,1,0,1,0,1,0,1,1,1,0,0,1,0},
+                {0,0,1,0,0,1,0,0,0,0,0,1,1,0,1,0,0,0,1,0,1,1,0,1,0,1,1,1,0,0,1,0},
+                {0,1,1,0,0,1,1,1,1,0,1,1,1,0,1,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,0,0},
+                {0,1,1,0,1,1,1,1,0,1,0,1,0,0,0,1,0,0,0,0,1,1,1,0,1,0,0,0,0,0,0,0}
         };
+
         int iterations = 10000;
+
+
+
+        // Define step size for temperature and cooling rate (adjust as needed)
+        double temperatureStep = 0.01;
+        double coolingRateStep = 0.01;
 
         // Validate graph
         int validationResult = validateGraph(graph);
@@ -31,7 +60,7 @@ public class GraphColoring { // Class name
         }
 
         // Generate initial colouring
-        ArrayList<Integer> colouring = initialColouring(graph.length);
+        ArrayList<Integer> colouring = initialColouring(graph);
         System.out.println("Initial Colouring: " + colouring);
 
         // Check for colour clashes in initial colouring
@@ -44,37 +73,34 @@ public class GraphColoring { // Class name
         int initialFitness = calculateFitness(graph, colouring);
         System.out.println("Initial Fitness: " + initialFitness);
 
-        // Run Simulated Annealing
-        ArrayList<Integer> bestColouring = colorGraph(graph, iterations);
+        // Loop through different temperatures and cooling rates
+        for (double temperature = 0.0; temperature <= 1.0; temperature += temperatureStep) {
+            for (double coolingRate = 0.0; coolingRate <= 1.0; coolingRate += coolingRateStep) {
+                // Run Simulated Annealing with current parameters
+                ArrayList<Integer> bestColouring = colorGraph(graph, iterations);
 
-        // Verify best colouring size
-        if (bestColouring.size() != graph.length) {
-            System.out.println("Error: Best colouring size mismatch.");
-            return;
+
+                // Verify best colouring size
+                if (bestColouring.size() != graph.length) {
+                    System.out.println("Error: Best colouring size mismatch.");
+                    return;
+                }
+
+                // Print results for this temperature and cooling rate
+                System.out.println("\nTemperature: " + temperature + ", Cooling Rate: " + coolingRate);
+                System.out.println("Best Colouring: " + bestColouring);
+                int bestClashes = colourClashes(bestColouring, graph);
+                System.out.println("Best Fitness: " + calculateFitness(graph, bestColouring));
+                System.out.println("Checking random node: " + (int) (Math.random() * graph.length));
+
+                // You can add further analysis of bestColouring here (e.g., number of clashes)
+            }
         }
-
-        // Print best colouring and fitness
-        System.out.println("After Simulated Annealing:");
-        System.out.println("Best Colouring: " + bestColouring);
-        int bestClashes = colourClashes(bestColouring, graph);
-        System.out.println("Best Fitness: " + calculateFitness(graph, bestColouring));
-
-        // Check for clashes in best colouring using your method
-//        if (bestClashes > 0) {
-//            System.out.println("Note: Best colouring still has " + bestClashes +  " clashes.");
-//        } else {
-//            System.out.println("Success: Best colouring has no clashes!");
-//        }
-
-        int randomNode = (int) (Math.random() * graph.length);
-        int randomNodeClashes = colourClashes(bestColouring, graph);
-
-        System.out.println("Checking random node: " + randomNode);
-        System.out.println("Clashes at random node: " + randomNodeClashes);
-
-
-
     }
+
+
+
+
 
 
     public static int validateGraph(int[][] graph) {
@@ -104,27 +130,48 @@ public class GraphColoring { // Class name
         return 1; // Valid graph
     }
 
-    public static ArrayList<Integer> initialColouring(int n) {
-        ArrayList<Integer> colouring = new ArrayList<>(n);
+    public static ArrayList<Integer> initialColouring(int[][] graph) {
+        // Check for valid graph size
+        if (graph.length == 0) {
+            throw new IllegalArgumentException("Graph cannot be empty for colouring.");
+        }
+
+        ArrayList<Integer> colouring = new ArrayList<>(graph.length); // Use graph.length for number of nodes
         Random random = new Random();
-        for (int i = 0; i < n; i++) {
-            colouring.add(random.nextInt(4) + 1); // Random colour between 1 and 4
+        for (int i = 0; i < graph.length; i++) {
+            int colour = random.nextInt(4) + 1; // Random colour between 1 and 4
+
+            // Check for valid colour range (optional)
+            if (colour < 1 || colour > 4) {
+                throw new IllegalStateException("Unexpected colour generated: " + colour);
+            }
+            colouring.add(colour);
         }
         return colouring;
     }
 
     public static int colourClashes(ArrayList<Integer> colouring, int[][] graph) {
+        // Check for valid colouring size (optional)
+        if (colouring.size() != graph.length) {
+            throw new IllegalArgumentException("Colouring size mismatch with graph size.");
+        }
+
+        // Check for empty colouring (optional)
+        if (colouring.isEmpty()) {
+            throw new IllegalArgumentException("Colouring cannot be empty.");
+        }
+
         int randomNode = (int) (Math.random() * graph.length); // Generate a random node index
 
         int clashes = 0;
         for (int neighbour = 0; neighbour < graph.length; neighbour++) {
             if (neighbour != randomNode && graph[randomNode][neighbour] == 1 && colouring.get(randomNode) == colouring.get(neighbour)) {
                 clashes++;
-
             }
         }
         return clashes;
     }
+
 
     public static int calculateFitness(int[][] graph, ArrayList<Integer> colouring) {
         int clashes = 0;
@@ -149,20 +196,7 @@ public class GraphColoring { // Class name
         return newColouring;
     }
 
-    public static int[][] createMatrix(int size) {
-        int[][] matrix = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (i == j) {
-                    matrix[i][j] = 0; // No self-loops
-                } else {
-                    matrix[i][j] = 1; // Nodes i and j are connected
-                    matrix[j][i] = 1; // Symmetric
-                }
-            }
-        }
-        return matrix;
-    }
+
 
     public static ArrayList<Integer> colorGraph(int[][] graph, int iterations) {
         if (iterations <= 0) {
@@ -174,7 +208,8 @@ public class GraphColoring { // Class name
         }
 
         // Initialize random colouring
-        ArrayList<Integer> colouring = initialColouring(graph.length);
+        ArrayList<Integer> colouring = initialColouring(graph);
+
 
         int bestFitness = calculateFitness(graph, colouring);
         ArrayList<Integer> bestColouring = new ArrayList<>(colouring);
@@ -213,6 +248,7 @@ public class GraphColoring { // Class name
 
         return Math.exp(-deltaE / temperature);
     }
+
 
     }
 
