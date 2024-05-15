@@ -1,9 +1,11 @@
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
+
 
 public class GraphColoring { // Class name
 
-    private static final int MAX_COLORS = 4; // Maximum allowed colours
+//    private static final int MAX_COLORS = 4; // Maximum allowed colours
     private static final double INITIAL_TEMPERATURE = 0.99; // Initial temperature
     private static final double COOLING_RATE = 0.72; // Cooling rate
     public static void main(String[] args) {
@@ -74,8 +76,8 @@ public class GraphColoring { // Class name
         System.out.println("Initial Fitness: " + initialFitness);
 
         // Loop through different temperatures and cooling rates
-        for (double temperature = 0.0; temperature <= 1.0; temperature += temperatureStep) {
-            for (double coolingRate = 0.0; coolingRate <= 1.0; coolingRate += coolingRateStep) {
+        for (double temperature = 0.0; temperature <= 0.9; temperature += temperatureStep) {
+            for (double coolingRate = 0.0; coolingRate <= 0.9; coolingRate += coolingRateStep) {
                 // Run Simulated Annealing with current parameters
                 ArrayList<Integer> bestColouring = colorGraph(graph, iterations);
 
@@ -106,42 +108,42 @@ public class GraphColoring { // Class name
     public static int validateGraph(int[][] graph) {
 
         if (graph == null || graph.length == 0) {
-            return 0; // Empty graph
+            return 0;
         }
 
         int rows = graph.length;
 
-        // Check if all rows have the same number of columns
-        for (int i = 0; i < rows; i++) {
-            if (graph[i].length != rows) {
-                return -1; // Unequal columns
+
+        for (int[] ints : graph) {
+            if (ints.length != rows) {
+                return -1;
             }
         }
 
-        // Check for valid values (0 or 1)
-        for (int i = 0; i < rows; i++) {
+
+        for (int[] ints : graph) {
             for (int j = 0; j < rows; j++) {
-                if (graph[i][j] != 0 && graph[i][j] != 1) {
-                    return -2; // Invalid value
+                if (ints[j] != 0 && ints[j] != 1) {
+                    return -2;
                 }
             }
         }
 
-        return 1; // Valid graph
+        return 1;
     }
 
     public static ArrayList<Integer> initialColouring(int[][] graph) {
-        // Check for valid graph size
+
         if (graph.length == 0) {
             throw new IllegalArgumentException("Graph cannot be empty for colouring.");
         }
 
-        ArrayList<Integer> colouring = new ArrayList<>(graph.length); // Use graph.length for number of nodes
+        ArrayList<Integer> colouring = new ArrayList<>(graph.length);
         Random random = new Random();
         for (int i = 0; i < graph.length; i++) {
-            int colour = random.nextInt(4) + 1; // Random colour between 1 and 4
+            int colour = random.nextInt(4) + 1;
 
-            // Check for valid colour range (optional)
+
             if (colour < 1 || colour > 4) {
                 throw new IllegalStateException("Unexpected colour generated: " + colour);
             }
@@ -151,17 +153,17 @@ public class GraphColoring { // Class name
     }
 
     public static int colourClashes(ArrayList<Integer> colouring, int[][] graph) {
-        // Check for valid colouring size (optional)
+
         if (colouring.size() != graph.length) {
             throw new IllegalArgumentException("Colouring size mismatch with graph size.");
         }
 
-        // Check for empty colouring (optional)
+
         if (colouring.isEmpty()) {
             throw new IllegalArgumentException("Colouring cannot be empty.");
         }
 
-        int randomNode = (int) (Math.random() * graph.length); // Generate a random node index
+        int randomNode = (int) (Math.random() * graph.length);
 
         int clashes = 0;
         for (int neighbour = 0; neighbour < graph.length; neighbour++) {
@@ -179,7 +181,7 @@ public class GraphColoring { // Class name
 
         for (int i = 0; i < graph.length; i++) {
             for (int j = i + 1; j < graph.length; j++) {
-                if (graph[i][j] == 1 && colouring.get(i) == colouring.get(j) && !visited[j]) {
+                if (graph[i][j] == 1 && Objects.equals(colouring.get(i), colouring.get(j)) && !visited[j]) {
                     clashes++;
                     visited[j] = true;
                 }
@@ -189,64 +191,43 @@ public class GraphColoring { // Class name
     }
 
     public static ArrayList<Integer> smallChange(ArrayList<Integer> colouring) {
-        ArrayList<Integer> newColouring = new ArrayList<>(colouring); // Copy the arrangement
+        ArrayList<Integer> newColouring = new ArrayList<>(colouring);
         Random random = new Random();
         int nodeToChange = random.nextInt(colouring.size());
-        newColouring.set(nodeToChange, random.nextInt(4) + 1); // Assign new random colour
+        newColouring.set(nodeToChange, random.nextInt(4) + 1);
         return newColouring;
     }
 
 
 
     public static ArrayList<Integer> colorGraph(int[][] graph, int iterations) {
-        if (iterations <= 0) {
-            throw new IllegalArgumentException("Iterations must be greater than 0");
-        }
 
-        if (validateGraph(graph) != 1) {
-            throw new IllegalArgumentException("Invalid graph input");
-        }
 
-        // Initialize random colouring
         ArrayList<Integer> colouring = initialColouring(graph);
-
-
         int bestFitness = calculateFitness(graph, colouring);
         ArrayList<Integer> bestColouring = new ArrayList<>(colouring);
 
-        // Simulated Annealing for specified iterations
         double temperature = INITIAL_TEMPERATURE;
         for (int i = 0; i < iterations; i++) {
             ArrayList<Integer> newColouring = smallChange(colouring);
             int newFitness = calculateFitness(graph, newColouring);
 
-            // Calculate probability of accepting worse solution
-            double deltaE = newFitness - bestFitness;
-            double probability = accept(temperature, deltaE);
 
-            // Accept worse solution with a probability
+            double deltaE = newFitness - bestFitness;
+            double probability = Math.exp(-deltaE / temperature);
+
+
             if (Math.random() < probability) {
                 colouring = new ArrayList<>(newColouring);
-            } else {
-                // Keep the current solution
             }
 
-            // Update best if needed
+
             bestFitness = Math.min(bestFitness, newFitness);
 
-            temperature *= COOLING_RATE; // Cool down the temperature
+            temperature *= COOLING_RATE;
         }
 
         return bestColouring;
-    }
-
-    private static double accept(double temperature, double deltaE) {
-        // Metropolis acceptance criterion
-        if (deltaE < 0) { // Always accept improvement
-            return 1.0;
-        }
-
-        return Math.exp(-deltaE / temperature);
     }
 
 
